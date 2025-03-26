@@ -1,98 +1,177 @@
-// audio.js - 音频管理系统 (修复版)
-
+// audio.js - 音频系统
 // 音频状态
 let audioEnabled = true;
-let musicEnabled = true;
 let soundEnabled = true;
-let currentBgMusic = null;
 
-// 使用在线音频资源
-const audio = {
-    // 背景音乐 - 使用免费音乐资源
-    bgm: {
-        main: new Audio('https://assets.mixkit.co/music/preview/mixkit-relaxing-in-nature-522.mp3'), // 轻松氛围音乐
-        alternate: new Audio('https://assets.mixkit.co/music/preview/mixkit-piano-meditation-112.mp3') // 冥想钢琴曲
-    },
-    // 操作音效 - 使用免费音效资源
-    sfx: {
-        click: new Audio('https://assets.mixkit.co/sfx/preview/mixkit-positive-interface-beep-221.mp3'),
-        draw: new Audio('https://assets.mixkit.co/sfx/preview/mixkit-game-ball-tap-2073.mp3'),
-        play: new Audio('https://assets.mixkit.co/sfx/preview/mixkit-positive-notification-951.mp3'),
-        shuffle: new Audio('https://assets.mixkit.co/sfx/preview/mixkit-swift-card-shuffle-3175.mp3'),
-        success: new Audio('https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3')
-    }
-};
+// 创建音频上下文
+let audioContext = null;
 
-// 初始化音频
+// 初始化音频系统
 function initAudio() {
-    // 设置所有背景音乐为循环播放
-    for (const key in audio.bgm) {
-        audio.bgm[key].loop = true;
-        audio.bgm[key].volume = 0.5; // 背景音乐音量适中
-    }
-    
-    // 设置音效音量
-    for (const key in audio.sfx) {
-        audio.sfx[key].volume = 0.7;
-    }
-    
-    // 从本地存储加载音频设置
-    loadAudioSettings();
-    
-    // 添加界面控制
-    createAudioControls();
-}
-
-// 播放背景音乐
-function playBackgroundMusic(key = 'main') {
-    if (!audioEnabled || !musicEnabled) return;
-    
-    // 如果有正在播放的音乐，先停止
-    if (currentBgMusic) {
-        audio.bgm[currentBgMusic].pause();
-        audio.bgm[currentBgMusic].currentTime = 0;
-    }
-    
-    // 播放新音乐
-    if (audio.bgm[key]) {
-        audio.bgm[key].play().catch(e => console.log('背景音乐播放失败:', e));
-        currentBgMusic = key;
+    try {
+        // 只有在用户交互后才创建音频上下文
+        document.addEventListener('click', function initAudioOnInteraction() {
+            try {
+                // 创建音频上下文
+                window.AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioContext = new AudioContext();
+                console.log("音频系统初始化成功");
+            } catch (e) {
+                console.log("音频上下文创建失败:", e);
+                audioEnabled = false;
+            }
+            document.removeEventListener('click', initAudioOnInteraction);
+        }, { once: true });
+        
+        // 从本地存储加载音频设置
+        loadAudioSettings();
+        
+        // 添加界面控制
+        createAudioControls();
+    } catch (e) {
+        console.log("音频系统初始化失败:", e);
+        audioEnabled = false;
     }
 }
 
-// 检查背景音乐是否播放中
-function isMusicPlaying() {
-    return audioEnabled && musicEnabled && currentBgMusic && 
-           !audio.bgm[currentBgMusic].paused;
+// 播放点击音效
+function playClickSound() {
+    if (!audioContext || !audioEnabled || !soundEnabled) return;
+    
+    try {
+        // 创建振荡器
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        // 设置音调和类型
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(440, audioContext.currentTime); // A4音
+        
+        // 设置音量和淡出
+        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.1);
+        
+        // 连接节点
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        // 播放并停止
+        oscillator.start();
+        oscillator.stop(audioContext.currentTime + 0.1);
+    } catch (e) {
+        console.log("播放点击音效失败:", e);
+    }
+}
+
+// 播放抽卡音效
+function playDrawSound() {
+    if (!audioContext || !audioEnabled || !soundEnabled) return;
+    
+    try {
+        // 创建振荡器
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        // 设置音调和类型
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5音
+        oscillator.frequency.exponentialRampToValueAtTime(783.99, audioContext.currentTime + 0.2); // G5音
+        
+        // 设置音量和淡出
+        gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3);
+        
+        // 连接节点
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        // 播放并停止
+        oscillator.start();
+        oscillator.stop(audioContext.currentTime + 0.3);
+    } catch (e) {
+        console.log("播放抽卡音效失败:", e);
+    }
+}
+
+// 播放出牌音效
+function playCardSound() {
+    if (!audioContext || !audioEnabled || !soundEnabled) return;
+    
+    try {
+        // 创建振荡器
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        // 设置音调和类型
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime); // E5音
+        oscillator.frequency.exponentialRampToValueAtTime(523.25, audioContext.currentTime + 0.2); // C5音
+        
+        // 设置音量和淡出
+        gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3);
+        
+        // 连接节点
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        // 播放并停止
+        oscillator.start();
+        oscillator.stop(audioContext.currentTime + 0.3);
+    } catch (e) {
+        console.log("播放出牌音效失败:", e);
+    }
+}
+
+// 播放成功音效
+function playSuccessSound() {
+    if (!audioContext || !audioEnabled || !soundEnabled) return;
+    
+    try {
+        // 创建振荡器
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        // 设置音调和类型
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5音
+        oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1); // E5音
+        oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2); // G5音
+        
+        // 设置音量和淡出
+        gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.5);
+        
+        // 连接节点
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        // 播放并停止
+        oscillator.start();
+        oscillator.stop(audioContext.currentTime + 0.5);
+    } catch (e) {
+        console.log("播放成功音效失败:", e);
+    }
 }
 
 // 播放音效
-function playSfx(key) {
+function playSfx(type) {
     if (!audioEnabled || !soundEnabled) return;
     
-    if (audio.sfx[key]) {
-        // 克隆音频对象，允许音效重叠播放
-        const sound = audio.sfx[key].cloneNode();
-        sound.volume = audio.sfx[key].volume;
-        sound.play().catch(e => console.log(`音效 ${key} 播放失败:`, e));
+    switch(type) {
+        case 'click':
+            playClickSound();
+            break;
+        case 'draw':
+            playDrawSound();
+            break;
+        case 'play':
+            playCardSound();
+            break;
+        case 'success':
+            playSuccessSound();
+            break;
     }
-}
-
-// 切换音乐开关
-function toggleMusic() {
-    musicEnabled = !musicEnabled;
-    
-    if (musicEnabled && currentBgMusic) {
-        audio.bgm[currentBgMusic].play().catch(e => console.log('背景音乐播放失败:', e));
-    } else {
-        for (const key in audio.bgm) {
-            audio.bgm[key].pause();
-        }
-    }
-    
-    // 更新UI和保存设置
-    updateAudioControlUI();
-    saveAudioSettings();
 }
 
 // 切换音效开关
@@ -105,17 +184,6 @@ function toggleSound() {
 // 切换全部音频
 function toggleAudio() {
     audioEnabled = !audioEnabled;
-    
-    if (!audioEnabled) {
-        // 停止所有音频
-        for (const key in audio.bgm) {
-            audio.bgm[key].pause();
-        }
-    } else if (musicEnabled && currentBgMusic) {
-        // 恢复背景音乐
-        audio.bgm[currentBgMusic].play().catch(e => console.log('背景音乐播放失败:', e));
-    }
-    
     updateAudioControlUI();
     saveAudioSettings();
 }
@@ -123,7 +191,6 @@ function toggleAudio() {
 // 保存音频设置到本地存储
 function saveAudioSettings() {
     localStorage.setItem('audioEnabled', audioEnabled);
-    localStorage.setItem('musicEnabled', musicEnabled);
     localStorage.setItem('soundEnabled', soundEnabled);
 }
 
@@ -131,10 +198,6 @@ function saveAudioSettings() {
 function loadAudioSettings() {
     if (localStorage.getItem('audioEnabled') !== null) {
         audioEnabled = localStorage.getItem('audioEnabled') === 'true';
-    }
-    
-    if (localStorage.getItem('musicEnabled') !== null) {
-        musicEnabled = localStorage.getItem('musicEnabled') === 'true';
     }
     
     if (localStorage.getItem('soundEnabled') !== null) {
@@ -149,7 +212,6 @@ function createAudioControls() {
     audioControl.className = 'audio-control';
     audioControl.innerHTML = `
         <button id="toggleAudio" class="audio-btn" title="总开关">🔊</button>
-        <button id="toggleMusic" class="audio-btn" title="音乐">🎵</button>
         <button id="toggleSound" class="audio-btn" title="音效">🎮</button>
     `;
     
@@ -165,11 +227,6 @@ function createAudioControls() {
         playSfx('click');
     });
     
-    document.getElementById('toggleMusic').addEventListener('click', () => {
-        toggleMusic();
-        playSfx('click');
-    });
-    
     document.getElementById('toggleSound').addEventListener('click', () => {
         toggleSound();
         if (soundEnabled) playSfx('click');
@@ -182,17 +239,11 @@ function createAudioControls() {
 // 更新音频控制按钮UI状态
 function updateAudioControlUI() {
     const audioBtn = document.getElementById('toggleAudio');
-    const musicBtn = document.getElementById('toggleMusic');
     const soundBtn = document.getElementById('toggleSound');
     
     if (audioBtn) {
         audioBtn.textContent = audioEnabled ? '🔊' : '🔇';
         audioBtn.classList.toggle('disabled', !audioEnabled);
-    }
-    
-    if (musicBtn) {
-        musicBtn.textContent = musicEnabled && audioEnabled ? '🎵' : '🎵❌';
-        musicBtn.classList.toggle('disabled', !musicEnabled || !audioEnabled);
     }
     
     if (soundBtn) {
@@ -237,35 +288,13 @@ function setupAudioEvents() {
     });
 }
 
-// 移动端触摸支持
-function setupTouchAudio() {
-    // 确保在用户首次点击后才播放背景音乐（iOS需要用户交互后才能自动播放）
-    document.addEventListener('touchstart', function() {
-        if (audioEnabled && musicEnabled && currentBgMusic === null) {
-            playBackgroundMusic();
-        }
-    }, { once: true });
-}
-
 // 导出函数供其他文件使用
 window.audioManager = {
     init: function() {
         initAudio();
         setupAudioEvents();
-        setupTouchAudio();
-        
-        // 延迟初始化背景音乐，等待用户交互
-        document.addEventListener('click', function startAudioOnInteraction() {
-            if (audioEnabled && musicEnabled) {
-                playBackgroundMusic();
-            }
-            document.removeEventListener('click', startAudioOnInteraction);
-        }, { once: true });
     },
     play: playSfx,
-    playMusic: playBackgroundMusic,
     toggleAudio: toggleAudio,
-    toggleMusic: toggleMusic,
-    toggleSound: toggleSound,
-    isMusicPlaying: isMusicPlaying
+    toggleSound: toggleSound
 };

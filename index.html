@@ -3,9 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>卡牌游戏</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="simple-audio.css">
+    <title>卡牌游戏 - 登录</title>
+    <style>
+        :root {
+            --primary-color: #4a69bd;
+            --secondary-color: #6a89cc;
+            --accent-color: #f6b93b;
+            --background-color: #f5f6fa;
+            --card-color: #ffffff;
+            --text-color: #2c3e50;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            height: 100vh;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        }
+        
+        .login-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        
+        .login-box {
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px var(--shadow-color);
+            text-align: center;
+            width: 350px;
+            max-width: 90%;
+        }
+        
+        .login-box h1 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+        
+        .login-box input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .login-box button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background-color 0.3s;
+        }
+        
+        .login-box button:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .remember-me {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            margin-top: 10px;
+        }
+        
+        .remember-me input {
+            width: auto;
+            margin-right: 10px;
+        }
+        
+        @media screen and (max-width: 480px) {
+            .login-box {
+                width: 90%;
+                padding: 30px;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- 登录页面 -->
@@ -23,184 +113,60 @@
         </div>
     </div>
     
-    <!-- 主应用界面 -->
-    <div class="app-container" id="appContainer">
-        <div class="header">
-            <h1>卡牌游戏</h1>
-        </div>
+    <script>
+        // 登录相关代码
+        const correctPassword = "100gift"; // 实际应用中应使用加密方式存储或服务器验证
         
-        <div class="nav">
-            <button class="nav-btn active" data-target="gameSection">游戏</button>
-            <button class="nav-btn" data-target="historySection">历史记录</button>
-            <button class="nav-btn" data-target="statsSection">统计</button>
-            <button class="nav-btn" data-target="manageSection">牌库管理</button>
-            <button class="nav-btn" data-target="settingsSection">设置</button>
-            <button id="logoutBtn">退出</button>
-            <!-- 音频控制按钮会通过JS动态添加到这里 -->
-        </div>
-        
-        <div class="container">
-            <!-- 游戏界面 -->
-            <div class="section active" id="gameSection">
-                <h2>游戏界面</h2>
-                
-                <div class="action-buttons">
-                    <button class="btn" id="drawCardBtn">抽卡</button>
-                    <button class="btn" id="playCardBtn" disabled>出牌</button>
-                </div>
-                
-                <div class="filter-controls">
-                    <button class="filter-btn all active" data-category="all">全部</button>
-                    <button class="filter-btn 养自己" data-category="养自己">养自己</button>
-                    <button class="filter-btn CBT" data-category="CBT">CBT</button>
-                    <button class="filter-btn 奖励" data-category="奖励">奖励</button>
-                </div>
-                
-                <h3>弃牌区</h3>
-                <div class="card-container" id="discardContainer">
-                    <div class="card empty-hint">
-                        <div class="card-image">🗑️</div>
-                        <div class="card-content">
-                            <div class="card-title">弃牌区</div>
-                            <div class="card-description">点击出牌按钮将手牌打出到弃牌区</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <h3>手牌</h3>
-                <div class="card-container" id="handContainer">
-                    <!-- 抽卡后的卡牌会显示在这里 -->
-                </div>
-            </div>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginBtn = document.getElementById('loginBtn');
+            const passwordInput = document.getElementById('passwordInput');
+            const loginError = document.getElementById('loginError');
+            const rememberMe = document.getElementById('rememberMe');
             
-            <!-- 历史记录界面 -->
-            <div class="section" id="historySection">
-                <h2>历史记录</h2>
-                
-                <div class="filter-controls">
-                    <button class="filter-btn all active" data-type="all">全部记录</button>
-                    <button class="filter-btn 养自己" data-type="draw">抽卡记录</button>
-                    <button class="filter-btn CBT" data-type="play">出牌记录</button>
-                </div>
-                
-                <div class="history-container" id="historyContainer">
-                    <!-- 历史记录会显示在这里 -->
-                </div>
-            </div>
+            // 检查是否已登录
+            checkLogin();
             
-            <!-- 统计界面 -->
-            <div class="section" id="statsSection">
-                <h2>统计信息</h2>
-                
-                <div class="stats-container">
-                    <div class="stat-card">
-                        <h3>总抽卡数</h3>
-                        <p id="totalDraws">0</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3>总出牌数</h3>
-                        <p id="totalPlays">0</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3>当前手牌</h3>
-                        <p id="currentHands">0</p>
-                    </div>
-                </div>
-                
-                <h3>类别统计</h3>
-                <div class="stats-container">
-                    <div class="stat-card" style="border-top: 5px solid var(--self-care-color);">
-                        <h3>养自己</h3>
-                        <p id="selfCareCount">0</p>
-                    </div>
-                    <div class="stat-card" style="border-top: 5px solid var(--cbt-color);">
-                        <h3>CBT</h3>
-                        <p id="cbtCount">0</p>
-                    </div>
-                    <div class="stat-card" style="border-top: 5px solid var(--reward-color);">
-                        <h3>奖励</h3>
-                        <p id="rewardCount">0</p>
-                    </div>
-                </div>
-            </div>
+            // 登录按钮点击事件
+            loginBtn.addEventListener('click', handleLogin);
             
-            <!-- 牌库管理界面 -->
-            <div class="section" id="manageSection">
-                <h2>牌库管理</h2>
-                
-                <div class="filter-controls">
-                    <button class="filter-btn all active" data-category="all">全部</button>
-                    <button class="filter-btn 养自己" data-category="养自己">养自己</button>
-                    <button class="filter-btn CBT" data-category="CBT">CBT</button>
-                    <button class="filter-btn 奖励" data-category="奖励">奖励</button>
-                </div>
-                
-                <form id="addCardForm">
-                    <div class="form-group">
-                        <label for="cardName">卡牌名称</label>
-                        <input type="text" id="cardName" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="cardDescription">卡牌描述</label>
-                        <textarea id="cardDescription" required></textarea>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="cardImage">卡牌图标</label>
-                        <input type="text" id="cardImage" placeholder="输入emoji或图片URL" value="🃏">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="cardCategory">卡牌类别</label>
-                        <select id="cardCategory">
-                            <option value="养自己">养自己</option>
-                            <option value="CBT">CBT</option>
-                            <option value="奖励">奖励</option>
-                        </select>
-                    </div>
-                    
-                    <button type="submit" class="btn">添加卡牌</button>
-                </form>
-                
-                <h3 style="margin-top: 20px;">现有卡牌</h3>
-                <div class="card-container" id="libraryContainer">
-                    <!-- 现有卡牌会显示在这里 -->
-                </div>
-            </div>
+            // 回车键登录
+            passwordInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    handleLogin();
+                }
+            });
             
-            <!-- 设置界面 -->
-            <div class="section" id="settingsSection">
-                <h2>设置</h2>
+            // 处理登录请求
+            function handleLogin() {
+                const password = passwordInput.value;
                 
-                <div class="settings-container">
-                    <div class="setting-group">
-                        <h3>密码设置</h3>
-                        <div class="form-group">
-                            <label for="currentPassword">当前密码</label>
-                            <input type="password" id="currentPassword" placeholder="输入当前密码">
-                        </div>
-                        <div class="form-group">
-                            <label for="newPassword">新密码</label>
-                            <input type="password" id="newPassword" placeholder="输入新密码">
-                        </div>
-                        <div class="form-group">
-                            <label for="confirmPassword">确认密码</label>
-                            <input type="password" id="confirmPassword" placeholder="再次输入新密码">
-                        </div>
-                        <button class="btn" id="changePasswordBtn">修改密码</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- 引入脚本文件 -->
-    <script src="cards.js"></script>
-    <script src="card-functions.js"></script>
-    <script src="ui-functions.js"></script>
-    <script src="auth.js"></script>
-    <script src="simple-audio.js"></script>
-    <script src="app.js"></script>
+                if (password === correctPassword) {
+                    // 保存登录状态（如果选择了记住密码）
+                    if (rememberMe.checked) {
+                        localStorage.setItem('isLoggedIn', 'true');
+                    } else {
+                        sessionStorage.setItem('isLoggedIn', 'true');
+                    }
+                    
+                    // 跳转到主应用页面
+                    window.location.href = 'app.html';
+                } else {
+                    loginError.style.display = 'block';
+                    setTimeout(() => {
+                        loginError.style.display = 'none';
+                    }, 3000);
+                }
+            }
+            
+            // 检查是否已登录
+            function checkLogin() {
+                if (localStorage.getItem('isLoggedIn') === 'true' || 
+                    sessionStorage.getItem('isLoggedIn') === 'true') {
+                    // 已登录，跳转到主应用页面
+                    window.location.href = 'app.html';
+                }
+            }
+        });
+    </script>
 </body>
 </html>

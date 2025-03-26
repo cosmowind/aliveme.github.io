@@ -208,15 +208,23 @@ function renderLibrary() {
  * 抽卡功能
  */
 function drawCard() {
+    // 获取手牌中的所有卡牌ID
+    const handCardIds = userHand.map(card => card.id);
+    
+    // 过滤出不在手牌中的卡牌
+    const availableCards = cardLibrary.filter(card => 
+        !handCardIds.includes(card.id)
+    );
+    
     // 检查是否还有卡牌可抽
-    if (cardLibrary.length === 0) {
-        alert('牌库已空！');
+    if (availableCards.length === 0) {
+        alert('没有可抽取的新卡牌！');
         return;
     }
     
     // 随机抽取一张卡牌
-    const randomIndex = Math.floor(Math.random() * cardLibrary.length);
-    const drawnCard = { ...cardLibrary[randomIndex] };
+    const randomIndex = Math.floor(Math.random() * availableCards.length);
+    const drawnCard = { ...availableCards[randomIndex] };
     
     // 生成唯一ID
     drawnCard.instanceId = Date.now();
@@ -236,7 +244,6 @@ function drawCard() {
     // 保存游戏状态
     saveGameState();
 }
-
 /**
  * 出牌功能
  */
