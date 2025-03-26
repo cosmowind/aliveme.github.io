@@ -1,0 +1,55 @@
+/* 音频控制样式 */
+.audio-control {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+    margin-right: 5px;
+}
+
+.audio-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    font-size: 18px;
+    margin: 0 3px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease-in-out;
+}
+
+.audio-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+}
+
+.audio-btn:active {
+    transform: scale(0.95);
+}
+
+.audio-btn.disabled {
+    opacity: 0.5;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* 移动端优化 */
+@media screen and (max-width: 767px) {
+    .audio-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
+    }
+}
+
+/* 小屏手机优化 */
+@media screen and (max-width: 375px) {
+    .audio-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 14px;
+    }
+}

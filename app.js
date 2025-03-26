@@ -3,7 +3,7 @@
 // 全局变量
 let cardLibrary = [...cardData]; // 从cards.js加载卡牌库
 let userHand = [];
-let discardPile = []; // 新增：弃牌堆
+let discardPile = []; // 弃牌堆
 let selectedCard = null;
 let history = [];
 let currentFilter = 'all';
@@ -27,6 +27,12 @@ const addCardForm = document.getElementById('addCardForm');
 const libraryContainer = document.getElementById('libraryContainer');
 const filterBtns = document.querySelectorAll('.filter-btn[data-category]');
 const historyFilterBtns = document.querySelectorAll('.filter-btn[data-type]');
+
+// 设置界面元素
+const currentPasswordInput = document.getElementById('currentPassword');
+const newPasswordInput = document.getElementById('newPassword');
+const confirmPasswordInput = document.getElementById('confirmPassword');
+const changePasswordBtn = document.getElementById('changePasswordBtn');
 
 // 统计元素
 const totalDraws = document.getElementById('totalDraws');
@@ -66,6 +72,11 @@ function setupEventListeners() {
     // 添加卡牌表单提交
     addCardForm.addEventListener('submit', addNewCard);
     
+    // 密码修改
+    if (changePasswordBtn) {
+        changePasswordBtn.addEventListener('click', changePassword);
+    }
+    
     // 添加移动端触摸事件优化
     addTouchSupport();
 }
@@ -99,10 +110,59 @@ function addTouchSupport() {
     });
 }
 
+/**
+ * 修改密码
+ */
+function changePassword() {
+    const currentPwd = currentPasswordInput.value;
+    const newPwd = newPasswordInput.value;
+    const confirmPwd = confirmPasswordInput.value;
+    
+    // 验证当前密码
+    if (currentPwd !== correctPassword) {
+        alert('当前密码不正确');
+        return;
+    }
+    
+    // 验证新密码
+    if (!newPwd) {
+        alert('新密码不能为空');
+        return;
+    }
+    
+    // 验证确认密码
+    if (newPwd !== confirmPwd) {
+        alert('两次输入的密码不一致');
+        return;
+    }
+    
+    // 更新密码
+    correctPassword = newPwd;
+    localStorage.setItem('gamePassword', newPwd);
+    
+    // 清空输入框
+    currentPasswordInput.value = '';
+    newPasswordInput.value = '';
+    confirmPasswordInput.value = '';
+    
+    // 播放成功音效
+    if (window.audioManager) {
+        window.audioManager.play('success');
+    }
+    
+    alert('密码修改成功');
+}
+
 // 初始化应用
 function initApp() {
     // 设置事件监听器
     setupEventListeners();
+    
+    // 检查是否有保存的密码
+    const savedPassword = localStorage.getItem('gamePassword');
+    if (savedPassword) {
+        correctPassword = savedPassword;
+    }
     
     // 检查登录状态
     checkLogin();
@@ -110,6 +170,11 @@ function initApp() {
     // 添加移动端优化
     if ('ontouchstart' in window) {
         document.body.classList.add('touch-device');
+    }
+    
+    // 初始化音频系统（如果存在）
+    if (window.audioManager) {
+        window.audioManager.init();
     }
 }
 

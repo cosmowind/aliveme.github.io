@@ -1,0 +1,96 @@
+/* 音频控制样式 */
+.audio-control {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+    margin-right: 5px;
+}
+
+.audio-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    font-size: 18px;
+    margin: 0 3px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease-in-out;
+}
+
+.audio-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+}
+
+.audio-btn:active {
+    transform: scale(0.95);
+}
+
+.audio-btn.disabled {
+    opacity: 0.5;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* 音频可视化效果 */
+.audio-visualizer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    pointer-events: none;
+    z-index: 5;
+    opacity: 0.7;
+}
+
+.audio-bar {
+    width: 3px;
+    margin: 0 2px;
+    background-color: var(--primary-color);
+    height: 5px;
+    border-radius: 1px;
+    transition: height 0.1s ease;
+}
+
+/* 播放时的动画效果 */
+@keyframes musicPlaying {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.5);
+    }
+    70% {
+        box-shadow: 0 0 0 5px rgba(255, 255, 255, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+    }
+}
+
+.audio-btn.playing {
+    animation: musicPlaying 2s infinite;
+}
+
+/* 移动端优化 */
+@media screen and (max-width: 767px) {
+    .audio-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
+    }
+}
+
+/* 小屏手机优化 */
+@media screen and (max-width: 375px) {
+    .audio-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 14px;
+    }
+}
